@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum Command {
+public enum CommandName {
     GAME("GAME"),
     MOVE("MOVE"),
     EXIT("EXIT"),
