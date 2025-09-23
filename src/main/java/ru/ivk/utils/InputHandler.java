@@ -1,4 +1,4 @@
-package ru.ivk;
+package ru.ivk.utils;
 
 import ru.ivk.enums.Command;
 import ru.ivk.model.UserInput;
