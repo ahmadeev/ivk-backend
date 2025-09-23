@@ -10,7 +10,7 @@ public class GameManager {
     private static SquaresGame currentGame;
 
     public static void startNewGame(int boardSize, String user1Type, String user1Color, String user2Type, String user2Color) {
-        Board board = new Board(boardSize, new String[boardSize][boardSize]);
+        Board board = new Board(boardSize);
         User user1 = new User(UserType.valueOf(user1Type), UserColor.valueOf(user1Color));
         User user2 = new User(UserType.valueOf(user2Type), UserColor.valueOf(user2Color));
         currentGame = new SquaresGame(board, user1, user2);
