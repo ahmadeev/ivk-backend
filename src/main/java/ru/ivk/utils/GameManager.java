@@ -26,4 +26,8 @@ public class GameManager {
     public static boolean hasActiveGame() {
         return currentGame != null;
     }
+
+    public static void resetCurrentGame() {
+        currentGame = null;
+    }
 }
