@@ -36,45 +36,39 @@ public class InputHandler {
             );
             System.out.println("Новая игра начата");
             // ------ wa: придумать красивое решение для ходов компьютера
-            try {
-                if (GameManager.getCurrentGame().getNextToMove().getUserType().equals(UserType.COMP)) {
-                    commands.get(CommandName.MOVE).accept(new String[]{"0", "0"});
-                    if (GameManager.getCurrentGame().getBoard().getEmptySquaresCount() == 0) {
-                        GameManager.resetCurrentGame();
-                        System.out.println("Игра окончена. Ничья.");
-                    }
+            if (!GameManager.hasActiveGame()) throw new RuntimeException("Игра не была создана!");
+            if (GameManager.getCurrentGame().getNextToMove().getUserType().equals(UserType.COMP)) {
+                commands.get(CommandName.MOVE).accept(new String[]{"0", "0"});
+                if (GameManager.getCurrentGame().getBoard().getEmptySquaresCount() == 0) {
+                    GameManager.resetCurrentGame();
+                    System.out.println("Игра окончена. Ничья.");
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("Что-то пошло не так... " + e.getMessage());
             }
             // ------
         });
         commands.put(CommandName.MOVE, (args) -> {
             if (!GameManager.hasActiveGame()) throw new RuntimeException("Невозможно выполнить ход: игра не была создана!");
-            // todo: валидировать при парсинге
-            Coordinates coordinates = new Coordinates(
-                    Integer.parseInt(args[0]),
-                    Integer.parseInt(args[1])
-            );
+            int x = Integer.parseInt(args[0]);
+            int y = Integer.parseInt(args[1]);
+            if (x < 0 || y < 0 || x >= GameManager.getCurrentGame().getBoard().getSize() || y >= GameManager.getCurrentGame().getBoard().getSize()) throw new RuntimeException("Введенные координаты не соответствуют условиям игры");
+            Coordinates coordinates = new Coordinates(x, y);
             String nextToMoveLabel;
+            nextToMoveLabel = GameManager.getCurrentGame().getNextToMove().getUserColor().getColor();
+            // wa: надо подумать на пробросом исключений
             try {
-                nextToMoveLabel = GameManager.getCurrentGame().getNextToMove().getUserColor().getColor();
                 GameManager.getCurrentGame().getNextToMove().makeMove(coordinates);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage());
             }
             System.out.printf("%s (%d, %d)%n", nextToMoveLabel, coordinates.getX(), coordinates.getY());
             // ------ wa: придумать красивое решение для ходов компьютера
-            try {
-                if (GameManager.getCurrentGame().getNextToMove().getUserType().equals(UserType.COMP)) {
-                    commands.get(CommandName.MOVE).accept(new String[]{"0", "0"});
-                    if (GameManager.getCurrentGame().getBoard().getEmptySquaresCount() == 0) {
-                        GameManager.resetCurrentGame();
-                        System.out.println("Игра окончена. Ничья.");
-                    }
+            if (!GameManager.hasActiveGame()) throw new RuntimeException("Игра не была создана!");
+            if (GameManager.getCurrentGame().getNextToMove().getUserType().equals(UserType.COMP)) {
+                commands.get(CommandName.MOVE).accept(new String[]{"0", "0"});
+                if (GameManager.getCurrentGame().getBoard().getEmptySquaresCount() == 0) {
+                    GameManager.resetCurrentGame();
+                    System.out.println("Игра окончена. Ничья.");
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("Что-то пошло не так... " + e.getMessage());
             }
             // ------
         });
@@ -100,14 +94,14 @@ public class InputHandler {
 
         String[] args = new String[0];
         if (tokens.length > 1) {
-            args = Arrays.stream(tokens[1].split("\\s++,\\s++")).map(String::trim).toArray(String[]::new);
+            args = Arrays.stream(tokens[1].split(",")).map(String::trim).toArray(String[]::new);
         }
 
         switch (cmd) {
             case GAME:
                 // GAME N, U1, U2
                 // N > 2; U -> 'TYPE C'
-                if (args.length != 3) throw new Exception("Неверное число аргументов! (Ожидается 3 аргумента)");
+                if (args.length != 3) throw new Exception(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", 3, args.length));
                 if (!integerPattern.matcher(args[0]).matches()) throw new Exception("Неверный тип аргумента № 1! (Ожидается целочисленный тип)");
                 if (Integer.parseInt(args[0]) <= 2) throw new Exception("Неверный тип аргумента № 1! (Ожидается целое число, большее двух)");
                 if (!userConfigPattern.matcher(args[1]).matches()) throw new Exception("Неверный тип аргумента № 2! (Ожидается строка в формате 'TYPE COLOR')");
@@ -115,13 +109,13 @@ public class InputHandler {
                 return new UserInput(cmd, args);
             case MOVE:
                 // MOVE X, Y
-                if (args.length != 2) throw new Exception("Неверное число аргументов! (Ожидается 2 аргумента)");
+                if (args.length != 2) throw new Exception(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", 2, args.length));
                 if (!integerPattern.matcher(args[0]).matches()) throw new Exception("Неверный тип аргумента № 1! (Ожидается целочисленный тип)");
                 if (!integerPattern.matcher(args[1]).matches()) throw new Exception("Неверный тип аргумента № 2! (Ожидается целочисленный тип)");
                 return new UserInput(cmd, args);
             case EXIT:
             case HELP:
-                if (args.length != 0) throw new Exception("Неверное число аргументов! (Ожидается 0 аргументов)");
+                if (args.length != 0) throw new Exception(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", 0, args.length));
                 return new UserInput(cmd, args);
             default:
                 throw new Exception("Что-то пошло не так... Введенная команда не существует!");

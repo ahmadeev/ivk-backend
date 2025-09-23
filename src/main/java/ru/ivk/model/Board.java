@@ -30,6 +30,7 @@ public class Board {
         }
         this.board[x][y] = user.getUserColor().getColor();
 
+        // note: принимаем, что игра существует
         emptySquaresCount--;
         GameManager.getCurrentGame().switchNextToMove();
     }

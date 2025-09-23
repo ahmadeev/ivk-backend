@@ -19,7 +19,7 @@ public class User {
             // todo: считаем лучшие координаты и записываем в coordinates
             coordinates = new Coordinates(0, 0);
         }
-        if (coordinates == null) throw new Exception("Что-то пошло не так... Координаты не были переданы.");
-        GameManager.getCurrentGame().getBoard().claim(this, coordinates);
+        if (coordinates == null) throw new RuntimeException("Что-то пошло не так... Координаты не были переданы."); // RuntimeException, потому что это совсем неудача, если координаты вдруг null
+        if (GameManager.hasActiveGame()) GameManager.getCurrentGame().getBoard().claim(this, coordinates);
     }
 }
