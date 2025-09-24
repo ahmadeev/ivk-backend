@@ -1,9 +1,9 @@
 package ru.ivk.model;
 
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 
-@AllArgsConstructor
+@Data
 @Getter
 public class Coordinates {
     private final int x;
