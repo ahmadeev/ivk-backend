@@ -41,6 +41,10 @@ public class GameLoop {
             while (true) {
                 log.info("Состояние игры: {}", state);
                 if (gm != null) log.info("Состояние доски: {}", gm.getGameBoard().getBoard());
+                if (gm == null && !(this.state.equals(GameState.IDLE))) {
+                    // если приходим сюда, то что-то точно сломалось. нет необходимости отлавливать и обрабатывать
+                    throw new RuntimeException("Что-то пошло не так... Игра не существует");
+                }
                 switch (state) {
                     case IDLE:
                         try {
@@ -71,7 +75,6 @@ public class GameLoop {
                             break;
                         }
                     case WAITING_FOR_PLAYER_MOVE:
-                        if (gm == null) throw new RuntimeException("Невозможно сделать ход. Игра не была создана");
                         log.info("Ход игрока: {}", gm.getCurrentPlayer());
                         Player currentPlayer = gm.getCurrentPlayer();
                         // Coordinates move = null; // в скоупе метода теперь
@@ -95,7 +98,7 @@ public class GameLoop {
                             }
                         } else if (currentPlayer.getType().equals(UserType.COMP)) {
                             setState(GameState.COMPUTING_PLAYERS_MOVE);
-
+                            // сначала проверяем потенциальные угрозы
                             List<Coordinates> threats = new LinkedList<>();
                             UserColor otherPlayerColor = UserColor.getOtherColor(currentPlayer.getColor());
                             for (Coordinates point : gm.getGameBoard().getMovesByColor(otherPlayerColor).keySet()) {
@@ -107,7 +110,7 @@ public class GameLoop {
                                 threats.addAll(pm);
                             }
                             move = Utilities.findMostFrequent(threats);
-
+                            // если угроз нет, проверяем выигрышные ходы
                             if (move == null) {
                                 List<Coordinates> moves = new LinkedList<>();
                                 for (Coordinates point : gm.getGameBoard().getMovesByColor(gm.getCurrentPlayer().getColor()).keySet()) {
@@ -119,30 +122,23 @@ public class GameLoop {
                                     moves.addAll(pm);
                                 }
                                 move = Utilities.findMostFrequent(moves);
-                                if (move == null) move = gm.getGameBoard().findRandomEmpty();
                             }
-/*                            try {
-                                // во время думанья будем отклонять игровые команды и чистить очередь
-                                log.info("SLEEPING");
-                                Thread.sleep(10_000);
-                                log.info("NOT SLEEPING");
-                            } catch (InterruptedException e) {
-                                log.info("INTERRUPTED");
-                            }*/
+                            // было бы хорошо во время думанья будем отклонять игровые команды и чистить очередь
                         }
+                        if (move == null) move = gm.getGameBoard().findRandomEmpty();
                         if (move == null) throw new RuntimeException("Что-то пошло не так... Ход не был выбран");
                         log.info("Полученный/посчитанный {}: {}", move.getClass().getSimpleName(), move);
                         try {
                             if (!gm.getGameBoard().isFree(move)) throw new RuntimeException("Невозможный ход. Поле уже занято");
-                        } catch (RuntimeException e) {
+                        } catch (Exception e) {
                             System.out.println(e.getMessage());
+                            break;
                         }
                         gm.getGameBoard().move(move, gm.getCurrentPlayer().getColor().getColor());
                         System.out.printf("%s (%d, %d)%n", gm.getCurrentPlayer().getColor().getColor(), move.getX(), move.getY());
                         setState(GameState.CHECKING_CONDITIONS);
                         break;
                     case CHECKING_CONDITIONS:
-                        if (gm == null) throw new RuntimeException("Что-то пошло не так... Игра не была создана");
                         boolean isWin = engine.isWin(gm.getGameBoard(), move, gm.getCurrentPlayer().getColor());
                         log.info("Победа игрока {}: {}", gm.getCurrentPlayer().getColor().getColor(), isWin);
                         if (isWin) {
@@ -153,7 +149,6 @@ public class GameLoop {
                         }
                         break;
                     case END:
-                        if (gm == null) throw new RuntimeException("Что-то пошло не так... Игра не была создана");
                         System.out.printf("Победа игрока %s%n", gm.getCurrentPlayer());
                         gm = null;
                         setState(GameState.IDLE);

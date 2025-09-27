@@ -72,9 +72,7 @@ public class GameEngine {
                 if (keys.get(j).equals(p0)) continue;
                 Coordinates p1 = keys.get(i);
                 Coordinates p2 = keys.get(j);
-                System.out.println("p0: " + p0 + ", p1: " + p1 + ", p2: " + p2);
                 Coordinates rightAngleVertex = PlaneMath.getRightAngleVertex(p0, p1, p2);
-                System.out.println("right angle vertex: " + rightAngleVertex);
                 if (rightAngleVertex == null) continue;
 
                 Vector v1;
