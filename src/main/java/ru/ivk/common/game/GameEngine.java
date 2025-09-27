@@ -1,6 +1,7 @@
 package ru.ivk.common.game;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.ivk.common.Utilities;
 import ru.ivk.common.game.model.UserColor;
 import ru.ivk.common.math.Coordinates;
 import ru.ivk.common.math.PlaneMath;
@@ -58,8 +59,7 @@ public class GameEngine {
 
     // todo: на больших досках не находит победу, потому что не складывается рамка из трех. идет глупый перебор
     // todo: нужно искать решения и для двух точек
-    // todo: нужен метод для нахождения всех рамок для цвета (не только с определенной точкой)
-    /** Возвращает список точек (с повторами), дополняющих некоторые рамки до квадрата */
+    /** Возвращает список точек (с повторами), дополняющих некоторые рамки до квадрата определенного цвета */
     public List<Coordinates> findFramesOfThree(GameBoard gameBoard, Coordinates p0, UserColor color) {
         Map<Coordinates, String> points = gameBoard.getMovesByColor(color);
         log.debug("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
@@ -106,5 +106,37 @@ public class GameEngine {
         }
 
         return frameMissingElements;
+    }
+
+    /** Возвращает список точек (с повторами), дополняющих некоторые рамки до квадрата определенного цвета */
+    public List<Coordinates> findFramesOfThree(GameBoard gameBoard, UserColor color) {
+        Map<Coordinates, String> points = gameBoard.getMovesByColor(color);
+        log.debug("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
+        List<Coordinates> frameMissingElements = new LinkedList<>();
+
+        if (points.size() < 3) return frameMissingElements;
+
+        for (Coordinates point : points.keySet()) {
+            List<Coordinates> pm = this.findFramesOfThree(gameBoard, point, color);
+            frameMissingElements.addAll(pm);
+        }
+
+        return frameMissingElements;
+    }
+    
+    public Coordinates findBestMove(GameBoard gameBoard, UserColor color) {
+        Coordinates move = null;
+        UserColor otherPlayerColor = UserColor.getOtherColor(color);
+        // сначала проверяем потенциальные угрозы
+        List<Coordinates> threats = this.findFramesOfThree(gameBoard, otherPlayerColor);
+        move = Utilities.findMostFrequent(threats);
+        // если угроз нет, проверяем выигрышные ходы
+        if (move == null) {
+            List<Coordinates> moves = this.findFramesOfThree(gameBoard, color);
+            move = Utilities.findMostFrequent(moves);
+        }
+        // если выигрышных ходов нет, берем случайный ход
+        if (move == null) move = gameBoard.findFirstEmpty();
+        return move;
     }
 }

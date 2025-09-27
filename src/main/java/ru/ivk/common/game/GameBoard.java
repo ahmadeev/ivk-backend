@@ -31,7 +31,7 @@ public class GameBoard {
         this.emptySquaresCount--;
     }
 
-    public Coordinates findRandomEmpty() {
+    public Coordinates findFirstEmpty() {
         Set<Coordinates> occupied = new HashSet<>(this.board.keySet());
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {

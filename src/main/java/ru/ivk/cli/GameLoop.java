@@ -3,6 +3,9 @@ package ru.ivk.cli;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import ru.ivk.cli.io.commands.game.dto.DTO;
+import ru.ivk.cli.io.commands.game.dto.GameDTO;
+import ru.ivk.cli.io.commands.game.dto.MoveDTO;
 import ru.ivk.common.game.GameBoard;
 import ru.ivk.common.game.GameEngine;
 import ru.ivk.common.game.GameManager;
@@ -10,14 +13,8 @@ import ru.ivk.common.game.model.GameState;
 import ru.ivk.common.game.model.Player;
 import ru.ivk.common.game.model.UserColor;
 import ru.ivk.common.game.model.UserType;
-import ru.ivk.common.Utilities;
-import ru.ivk.cli.io.commands.game.dto.DTO;
-import ru.ivk.cli.io.commands.game.dto.GameDTO;
-import ru.ivk.cli.io.commands.game.dto.MoveDTO;
 import ru.ivk.common.math.Coordinates;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
@@ -55,7 +52,7 @@ public class GameLoop {
                             if (dto instanceof MoveDTO) throw new RuntimeException("Ошибка: попытка сделать ход до создания игры");
                             GameDTO gameDTO = (GameDTO) dto;
                             log.debug("Полученный {}: {}", gameDTO.getClass().getSimpleName(), gameDTO);
-                            gm = new GameManager(
+                            this.gm = new GameManager(
                                     new GameBoard(gameDTO.getN()),
                                     new Player(
                                             UserType.valueOf(gameDTO.getPlayer1Type()),
@@ -66,17 +63,15 @@ public class GameLoop {
                                             UserColor.valueOf(gameDTO.getPlayer2Color())
                                     )
                             );
-                            state = GameState.WAITING_FOR_PLAYER_MOVE;
+                            setState(GameState.WAITING_FOR_PLAYER_MOVE);
                             System.out.println("Новая игра была создана");
-                            break;
                         } catch (InterruptedException e) {
                             System.out.println(e.getMessage());
                             Thread.currentThread().interrupt();
-                            break;
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
-                            break;
                         }
+                        break;
                     case WAITING_FOR_PLAYER_MOVE:
                         log.debug("Ход игрока: {}", gm.getCurrentPlayer());
                         Player currentPlayer = gm.getCurrentPlayer();
@@ -101,34 +96,9 @@ public class GameLoop {
                             }
                         } else if (currentPlayer.getType().equals(UserType.COMP)) {
                             setState(GameState.COMPUTING_PLAYERS_MOVE);
-                            // сначала проверяем потенциальные угрозы
-                            List<Coordinates> threats = new LinkedList<>();
-                            UserColor otherPlayerColor = UserColor.getOtherColor(currentPlayer.getColor());
-                            for (Coordinates point : gm.getGameBoard().getMovesByColor(otherPlayerColor).keySet()) {
-                                List<Coordinates> pm = engine.findFramesOfThree(
-                                        gm.getGameBoard(),
-                                        point,
-                                        otherPlayerColor
-                                );
-                                threats.addAll(pm);
-                            }
-                            move = Utilities.findMostFrequent(threats);
-                            // если угроз нет, проверяем выигрышные ходы
-                            if (move == null) {
-                                List<Coordinates> moves = new LinkedList<>();
-                                for (Coordinates point : gm.getGameBoard().getMovesByColor(gm.getCurrentPlayer().getColor()).keySet()) {
-                                    List<Coordinates> pm = engine.findFramesOfThree(
-                                            gm.getGameBoard(),
-                                            point,
-                                            currentPlayer.getColor()
-                                    );
-                                    moves.addAll(pm);
-                                }
-                                move = Utilities.findMostFrequent(moves);
-                            }
+                            move = engine.findBestMove(gm.getGameBoard(), gm.getCurrentPlayer().getColor());
                             // было бы хорошо во время думанья будем отклонять игровые команды и чистить очередь
                         }
-                        if (move == null) move = gm.getGameBoard().findRandomEmpty();
                         if (move == null) throw new RuntimeException("Что-то пошло не так... Ход не был выбран");
                         log.debug("Полученный/посчитанный {}: {}", move.getClass().getSimpleName(), move);
                         try {
@@ -162,6 +132,7 @@ public class GameLoop {
                         break;
                     case END:
                         gm = null;
+                        move = null;
                         setState(GameState.IDLE);
                         break;
                 }
