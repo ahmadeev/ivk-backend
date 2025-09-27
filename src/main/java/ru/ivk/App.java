@@ -1,12 +1,8 @@
 package ru.ivk;
 
 import org.slf4j.simple.SimpleLogger;
-import ru.ivk.game.GameEngine;
-import ru.ivk.game.GameLoop;
-import ru.ivk.utils.io.IOProcessor;
-import ru.ivk.utils.io.commands.game.dto.DTO;
-
-import java.util.concurrent.LinkedBlockingQueue;
+import ru.ivk.cli.CLIEntryPoint;
+import ru.ivk.web.WebEntryPoint;
 
 public class App {
     static {
@@ -19,12 +15,9 @@ public class App {
     }
 
     public static void main( String[] args ) {
-        LinkedBlockingQueue<DTO> sharedQueue = new LinkedBlockingQueue<>();
-
-        GameLoop loop = new GameLoop(sharedQueue, new GameEngine());
-        loop.run();
-
-        IOProcessor io = new IOProcessor(sharedQueue);
-        io.run();
+        if (args.length > 1) throw new RuntimeException("Неверное число аргументов запуска");
+        if (args[0].equals("--cli")) CLIEntryPoint.main(args);
+        else if (args[0].equals("--web")) WebEntryPoint.main(args);
+        else throw new RuntimeException("Неверный аргумент");
     }
 }

@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.ivk.utils.math.Coordinates;
-import ru.ivk.utils.math.PlaneMath;
+import ru.ivk.common.math.Coordinates;
+import ru.ivk.common.math.PlaneMath;
 
 import java.util.stream.Stream;
 
