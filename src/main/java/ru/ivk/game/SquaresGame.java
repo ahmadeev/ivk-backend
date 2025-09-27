@@ -1,4 +1,0 @@
-package ru.ivk.game;
-
-public class SquaresGame {
-}

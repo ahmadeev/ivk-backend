@@ -1,22 +1,73 @@
 package ru.ivk.utils.math;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+
 public class PlaneMath {
     /** Возвращает вершину прямого угла треугольника, если такой существует */
-    public static Coordinates getRightAngleVertex(Coordinates p1, Coordinates p2, Coordinates p3) {
+/*    public static Coordinates getRightAngleVertex(Coordinates p1, Coordinates p2, Coordinates p3) {
         double d12 = getTwoPointsDistance(p1, p2);
         double d13 = getTwoPointsDistance(p1, p3);
         double d23 = getTwoPointsDistance(p2, p3);
 
-        if (Double.compare(d12, d13) == 0 && isRightAngleTriangle(d23, d12, d13)) return p1;
-        if (Double.compare(d12, d23) == 0 && isRightAngleTriangle(d13, d12, d23)) return p2;
-        if (Double.compare(d13, d23) == 0 && isRightAngleTriangle(d12, d13, d23)) return p3;
+        if (!isRightAngleTriangle(d12, d13, d23)) return null;
+        if (Double.compare(d12, d23) < 0 && Double.compare(d13, d23) < 0) return p1;
+        if (Double.compare(d12, d13) < 0 && Double.compare(d23, d13) < 0) return p2;
+        if (Double.compare(d13, d12) < 0 && Double.compare(d23, d12) < 0) return p3;
 
+        return null;
+    }*/
+    public static Coordinates getRightAngleVertex(Coordinates p1, Coordinates p2, Coordinates p3) {
+        Vector v11 = new Vector(p1, p2);
+        Vector v12 = new Vector(p1, p3);
+        double sp1 = Vector.scalarProduct(v11, v12);
+        if (Double.compare(sp1, 0) == 0) {
+            return p1;
+        }
+        Vector v21 = new Vector(p2, p1);
+        Vector v22 = new Vector(p2, p3);
+        double sp2 = Vector.scalarProduct(v21, v22);
+        if (Double.compare(sp2, 0) == 0) {
+            return p2;
+        }
+        Vector v31 = new Vector(p3, p1);
+        Vector v32 = new Vector(p3, p2);
+        double sp3 = Vector.scalarProduct(v31, v32);
+        if (Double.compare(sp3, 0) == 0) {
+            return p3;
+        }
         return null;
     }
 
     /** По переданным длинам отрезков определяет, является ли треугольник прямоугольным */
-    public static boolean isRightAngleTriangle(double hypotenuse, double leg1, double leg2) {
-        return Double.compare(java.lang.Math.pow(leg1, 2) + java.lang.Math.pow(leg2, 2), java.lang.Math.pow(hypotenuse, 2)) == 0;
+    public static boolean isRightAngleTriangle(double a, double b, double c) {
+        double[] arr = new double[]{a, b, c};
+        Arrays.sort(arr);
+        BigDecimal aa = BigDecimal.valueOf(arr[0]);
+        BigDecimal bb = BigDecimal.valueOf(arr[1]);
+        BigDecimal cc = BigDecimal.valueOf(arr[2]);
+        return (aa.pow(2).add(bb.pow(2))).compareTo(cc.pow(2)) == 0;
+    }
+    public static boolean isRightAngleTriangle(Coordinates p1, Coordinates p2, Coordinates p3) {
+        Vector v11 = new Vector(p1, p2);
+        Vector v12 = new Vector(p1, p3);
+        double sp1 = Vector.scalarProduct(v11, v12);
+        if (Double.compare(sp1, 0) == 0) {
+            return true;
+        }
+        Vector v21 = new Vector(p2, p1);
+        Vector v22 = new Vector(p2, p3);
+        double sp2 = Vector.scalarProduct(v21, v22);
+        if (Double.compare(sp2, 0) == 0) {
+            return true;
+        }
+        Vector v31 = new Vector(p3, p1);
+        Vector v32 = new Vector(p3, p2);
+        double sp3 = Vector.scalarProduct(v31, v32);
+        if (Double.compare(sp3, 0) == 0) {
+            return true;
+        }
+        return false;
     }
 
     /** Возвращает расстояние между двумя точками на плоскости */

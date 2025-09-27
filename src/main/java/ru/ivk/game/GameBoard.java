@@ -1,10 +1,14 @@
 package ru.ivk.game;
 
 import lombok.Getter;
+import ru.ivk.game.model.UserColor;
 import ru.ivk.utils.math.Coordinates;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 public class GameBoard {
@@ -22,7 +26,31 @@ public class GameBoard {
         return !board.containsKey(coordinates);
     }
 
-    public void move(Coordinates coordinates) {
+    public void move(Coordinates coordinates, String color) {
+        this.board.put(coordinates, color);
+    }
 
+    public Coordinates findRandomEmpty() {
+        Set<Coordinates> occupied = new HashSet<>(this.board.keySet());
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                Coordinates c = new Coordinates(i, j);
+                if (!occupied.contains(c)) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
+/*    public Map<Coordinates, String> getFilteredMap(Coordinates coordinates, UserColor color) {
+        return this.board.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(color.getColor()) && !entry.getKey().equals(coordinates))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }*/
+    public Map<Coordinates, String> getFilteredMap(UserColor color) {
+        return this.board.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(color.getColor()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

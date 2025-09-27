@@ -9,4 +9,8 @@ public enum UserColor {
     WHITE("W"),
     BLACK("B");
     private final String color;
+
+    public static UserColor getOtherColor(UserColor color) {
+        return color.equals(WHITE) ? BLACK : WHITE;
+    }
 }

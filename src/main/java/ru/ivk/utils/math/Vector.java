@@ -31,4 +31,8 @@ public class Vector {
     public static Vector sum(Vector v1, Vector v2) {
         return new Vector(v1.getX() + v2.getX(), v1.getY() + v2.getY());
     }
+
+    public static double scalarProduct(Vector v1, Vector v2) {
+        return (v1.getX() * v2.getX() + v1.getY() * v2.getY()) / (v1.getLength() * v2.getLength());
+    }
 }
