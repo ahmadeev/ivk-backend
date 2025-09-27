@@ -15,7 +15,7 @@ import java.util.Map;
 public class GameEngine {
     public boolean isWin(GameBoard gameBoard, Coordinates coordinates, UserColor color) {
         Map<Coordinates, String> points = gameBoard.getMovesByColor(color);
-        log.info("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
+        log.debug("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
         if (points.size() < 4) return false;
 
         for (Coordinates key : points.keySet()) {
@@ -35,7 +35,7 @@ public class GameEngine {
             Coordinates point22 = new Coordinates(x1 - dy, y1 + dx);
             // две новые точки есть в мэпе? (если есть, то они уже нужного цвета)
             if (points.containsKey(point11) && points.containsKey(point12)) {
-                log.info("Найден квадрат с координатами: ({},{}), ({},{}), ({},{}), ({},{})",
+                log.debug("Найден квадрат с координатами: ({},{}), ({},{}), ({},{}), ({},{})",
                         point11.getX(), point11.getY(),
                         point12.getX(), point12.getY(),
                         key.getX(), key.getY(),
@@ -44,7 +44,7 @@ public class GameEngine {
                 return true;
             }
             if (points.containsKey(point21) && points.containsKey(point22)) {
-                log.info("Найден квадрат с координатами: ({}{}), ({}{}), ({}{}), ({}{})",
+                log.debug("Найден квадрат с координатами: ({}{}), ({}{}), ({}{}), ({}{})",
                         point21.getX(), point21.getY(),
                         point22.getX(), point22.getY(),
                         key.getX(), key.getY(),
@@ -59,7 +59,7 @@ public class GameEngine {
     /** Возвращает список точек (с повторами), дополняющих некоторые рамки до квадрата */
     public List<Coordinates> findFramesOfThree(GameBoard gameBoard, Coordinates p0, UserColor color) {
         Map<Coordinates, String> points = gameBoard.getMovesByColor(color);
-        log.info("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
+        log.debug("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
         List<Coordinates> frameMissingElements = new LinkedList<>();
 
         if (points.size() < 3) return frameMissingElements;
@@ -96,7 +96,7 @@ public class GameEngine {
                 int y = rightAngleVertex.getY() + sum.getY();
                 if (x < 0 || x >= gameBoard.getSize() || y < 0 || y >= gameBoard.getSize()) continue;
                 Coordinates missingPoint = new Coordinates(x, y);
-                log.info("Недостающая точка: {}", missingPoint);
+                log.debug("Недостающая точка: {}", missingPoint);
                 frameMissingElements.add(missingPoint);
             }
         }

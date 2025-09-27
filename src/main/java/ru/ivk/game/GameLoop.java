@@ -39,8 +39,8 @@ public class GameLoop {
         Runnable r = () -> {
             Coordinates move = null;
             while (true) {
-                log.info("Состояние игры: {}", state);
-                if (gm != null) log.info("Состояние доски: {}", gm.getGameBoard().getBoard());
+                log.debug("Состояние игры: {}", state);
+                if (gm != null) log.debug("Состояние доски: {}", gm.getGameBoard().getBoard());
                 if (gm == null && !(this.state.equals(GameState.IDLE))) {
                     // если приходим сюда, то что-то точно сломалось. нет необходимости отлавливать и обрабатывать
                     throw new RuntimeException("Что-то пошло не так... Игра не существует");
@@ -51,7 +51,7 @@ public class GameLoop {
                             DTO dto = queue.take();
                             if (dto instanceof MoveDTO) throw new RuntimeException("Ошибка: попытка сделать ход до создания игры");
                             GameDTO gameDTO = (GameDTO) dto;
-                            log.info("Полученный {}: {}", gameDTO.getClass().getSimpleName(), gameDTO);
+                            log.debug("Полученный {}: {}", gameDTO.getClass().getSimpleName(), gameDTO);
                             gm = new GameManager(
                                     new GameBoard(gameDTO.getN()),
                                     new Player(
@@ -75,7 +75,7 @@ public class GameLoop {
                             break;
                         }
                     case WAITING_FOR_PLAYER_MOVE:
-                        log.info("Ход игрока: {}", gm.getCurrentPlayer());
+                        log.debug("Ход игрока: {}", gm.getCurrentPlayer());
                         Player currentPlayer = gm.getCurrentPlayer();
                         // Coordinates move = null; // в скоупе метода теперь
                         if (currentPlayer.getType().equals(UserType.USER)) {
@@ -84,7 +84,7 @@ public class GameLoop {
                                     DTO dto = queue.take(); // TODO: МЫ ТУТ ЗАЦИКЛИЛИСЬ (.poll() будет лучше?)
                                     if (dto instanceof GameDTO) throw new RuntimeException("Невозможно создать игру. Игра уже существует");
                                     MoveDTO moveDTO = (MoveDTO) dto;
-                                    log.info("Полученный {}: {}", moveDTO.getClass().getSimpleName(), moveDTO);
+                                    log.debug("Полученный {}: {}", moveDTO.getClass().getSimpleName(), moveDTO);
                                     move = new Coordinates(moveDTO.getX(), moveDTO.getY());
                                     setState(GameState.COMPUTING_PLAYERS_MOVE);
                                 } catch (InterruptedException e) {
@@ -127,11 +127,13 @@ public class GameLoop {
                         }
                         if (move == null) move = gm.getGameBoard().findRandomEmpty();
                         if (move == null) throw new RuntimeException("Что-то пошло не так... Ход не был выбран");
-                        log.info("Полученный/посчитанный {}: {}", move.getClass().getSimpleName(), move);
+                        log.debug("Полученный/посчитанный {}: {}", move.getClass().getSimpleName(), move);
                         try {
                             if (!gm.getGameBoard().isFree(move)) throw new RuntimeException("Невозможный ход. Поле уже занято");
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
+                            setState(GameState.WAITING_FOR_PLAYER_MOVE);
+                            move = null;
                             break;
                         }
                         gm.getGameBoard().move(move, gm.getCurrentPlayer().getColor().getColor());
@@ -140,11 +142,12 @@ public class GameLoop {
                         break;
                     case CHECKING_CONDITIONS:
                         boolean isWin = engine.isWin(gm.getGameBoard(), move, gm.getCurrentPlayer().getColor());
-                        log.info("Победа игрока {}: {}", gm.getCurrentPlayer().getColor().getColor(), isWin);
+                        log.debug("Победа игрока {}: {}", gm.getCurrentPlayer().getColor().getColor(), isWin);
                         if (isWin) {
                             setState(GameState.END);
                         } else {
                             gm.switchCurrentPlayer();
+                            move = null;
                             setState(GameState.WAITING_FOR_PLAYER_MOVE);
                         }
                         break;

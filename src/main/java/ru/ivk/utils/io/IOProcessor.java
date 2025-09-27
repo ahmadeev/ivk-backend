@@ -39,9 +39,9 @@ public class IOProcessor {
                     if (commandResult.isGame()) {
                         boolean wasAdded = queue.offer((DTO) commandResult.getData());
                         if (!wasAdded) throw new RuntimeException("Не удалось выполнить команду");
-                        log.info("Отправка {}: {}", commandResult.getData().getClass().getSimpleName(), commandResult.getData());
+                        log.debug("Отправка {}: {}", commandResult.getData().getClass().getSimpleName(), commandResult.getData());
                     }
-                } catch (CommandNotFoundException e) {
+                } catch (CommandNotFoundException | InvalidNumberOfArgumentsException | InvalidArgumentTypeException e) {
                     System.out.println(e.getMessage());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -52,7 +52,7 @@ public class IOProcessor {
         t.start();
     }
 
-    public Command<?> awaitUserInput() throws Exception {
+    public Command<?> awaitUserInput() {
         System.out.print("> ");
 
         String input = scanner.nextLine();
