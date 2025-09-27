@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/squares")
 @RequiredArgsConstructor
-public class SquaresController {
+public class GameController {
     @GetMapping("/nextMove")
     public ResponseEntity<String> getMove() {
         return ResponseEntity.ok().body("Hello World!");
