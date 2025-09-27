@@ -14,7 +14,7 @@ import java.util.Map;
 @Slf4j
 public class GameEngine {
     public boolean isWin(GameBoard gameBoard, Coordinates coordinates, UserColor color) {
-        Map<Coordinates, String> points = gameBoard.getFilteredMap(color);
+        Map<Coordinates, String> points = gameBoard.getMovesByColor(color);
         log.info("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
         if (points.size() < 4) return false;
 
@@ -58,7 +58,7 @@ public class GameEngine {
 
     /** Возвращает список точек (с повторами), дополняющих некоторые рамки до квадрата */
     public List<Coordinates> findFramesOfThree(GameBoard gameBoard, Coordinates p0, UserColor color) {
-        Map<Coordinates, String> points = gameBoard.getFilteredMap(color);
+        Map<Coordinates, String> points = gameBoard.getMovesByColor(color);
         log.info("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
         List<Coordinates> frameMissingElements = new LinkedList<>();
 

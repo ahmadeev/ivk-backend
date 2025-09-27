@@ -1,5 +1,6 @@
 package ru.ivk.game;
 
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import ru.ivk.game.model.GameState;
@@ -24,6 +25,7 @@ public class GameLoop {
 
     private GameManager gm = null;
 
+    @Getter
     @Setter
     private GameState state;
 
@@ -69,14 +71,14 @@ public class GameLoop {
                             break;
                         }
                     case WAITING_FOR_PLAYER_MOVE:
-                        if (!hasActiveGame()) throw new RuntimeException("Невозможно сделать ход. Игра не была создана");
+                        if (gm == null) throw new RuntimeException("Невозможно сделать ход. Игра не была создана");
                         log.info("Ход игрока: {}", gm.getCurrentPlayer());
                         Player currentPlayer = gm.getCurrentPlayer();
-                        // Coordinates move = null;
+                        // Coordinates move = null; // в скоупе метода теперь
                         if (currentPlayer.getType().equals(UserType.USER)) {
-                            while (canAcceptMove()) {
+                            while (getState().equals(GameState.WAITING_FOR_PLAYER_MOVE)) {
                                 try {
-                                    DTO dto = queue.take(); // TODO: МЫ ТУТ ЗАЦИКЛИЛИСЬ
+                                    DTO dto = queue.take(); // TODO: МЫ ТУТ ЗАЦИКЛИЛИСЬ (.poll() будет лучше?)
                                     if (dto instanceof GameDTO) throw new RuntimeException("Невозможно создать игру. Игра уже существует");
                                     MoveDTO moveDTO = (MoveDTO) dto;
                                     log.info("Полученный {}: {}", moveDTO.getClass().getSimpleName(), moveDTO);
@@ -92,12 +94,11 @@ public class GameLoop {
                                 }
                             }
                         } else if (currentPlayer.getType().equals(UserType.COMP)) {
-                            // считаем в GameEngine
                             setState(GameState.COMPUTING_PLAYERS_MOVE);
 
                             List<Coordinates> threats = new LinkedList<>();
                             UserColor otherPlayerColor = UserColor.getOtherColor(currentPlayer.getColor());
-                            for (Coordinates point : gm.getGameBoard().getFilteredMap(otherPlayerColor).keySet()) {
+                            for (Coordinates point : gm.getGameBoard().getMovesByColor(otherPlayerColor).keySet()) {
                                 List<Coordinates> pm = engine.findFramesOfThree(
                                         gm.getGameBoard(),
                                         point,
@@ -109,7 +110,7 @@ public class GameLoop {
 
                             if (move == null) {
                                 List<Coordinates> moves = new LinkedList<>();
-                                for (Coordinates point : gm.getGameBoard().getFilteredMap(gm.getCurrentPlayer().getColor()).keySet()) {
+                                for (Coordinates point : gm.getGameBoard().getMovesByColor(gm.getCurrentPlayer().getColor()).keySet()) {
                                     List<Coordinates> pm = engine.findFramesOfThree(
                                             gm.getGameBoard(),
                                             point,
@@ -162,17 +163,5 @@ public class GameLoop {
         };
         Thread t = new Thread(r);
         t.start();
-    }
-
-    public boolean hasActiveGame() {
-        return gm != null;
-    }
-
-    public boolean canAcceptMove() {
-        return state.equals(GameState.WAITING_FOR_PLAYER_MOVE);
-    }
-
-    public boolean canStartGame() {
-        return state.equals(GameState.IDLE);
     }
 }

@@ -28,6 +28,7 @@ public class GameBoard {
 
     public void move(Coordinates coordinates, String color) {
         this.board.put(coordinates, color);
+        this.emptySquaresCount--;
     }
 
     public Coordinates findRandomEmpty() {
@@ -43,12 +44,7 @@ public class GameBoard {
         return null;
     }
 
-/*    public Map<Coordinates, String> getFilteredMap(Coordinates coordinates, UserColor color) {
-        return this.board.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(color.getColor()) && !entry.getKey().equals(coordinates))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }*/
-    public Map<Coordinates, String> getFilteredMap(UserColor color) {
+    public Map<Coordinates, String> getMovesByColor(UserColor color) {
         return this.board.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(color.getColor()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
