@@ -144,15 +144,20 @@ public class GameLoop {
                         boolean isWin = engine.isWin(gm.getGameBoard(), move, gm.getCurrentPlayer().getColor());
                         log.debug("Победа игрока {}: {}", gm.getCurrentPlayer().getColor().getColor(), isWin);
                         if (isWin) {
+                            System.out.printf("Победа игрока %s%n", gm.getCurrentPlayer());
                             setState(GameState.END);
-                        } else {
-                            gm.switchCurrentPlayer();
-                            move = null;
-                            setState(GameState.WAITING_FOR_PLAYER_MOVE);
+                            break;
                         }
+                        if (gm.getGameBoard().getEmptySquaresCount() == 0) {
+                            System.out.println("Игра окончена. Ничья");
+                            setState(GameState.END);
+                            break;
+                        }
+                        gm.switchCurrentPlayer();
+                        move = null;
+                        setState(GameState.WAITING_FOR_PLAYER_MOVE);
                         break;
                     case END:
-                        System.out.printf("Победа игрока %s%n", gm.getCurrentPlayer());
                         gm = null;
                         setState(GameState.IDLE);
                         break;

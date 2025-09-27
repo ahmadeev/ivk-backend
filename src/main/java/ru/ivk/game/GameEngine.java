@@ -56,6 +56,7 @@ public class GameEngine {
         return false;
     }
 
+    // todo: на больших досках не находит победу, потому что не складывается рамка из трех. идет глупый перебор
     /** Возвращает список точек (с повторами), дополняющих некоторые рамки до квадрата */
     public List<Coordinates> findFramesOfThree(GameBoard gameBoard, Coordinates p0, UserColor color) {
         Map<Coordinates, String> points = gameBoard.getMovesByColor(color);
@@ -95,6 +96,7 @@ public class GameEngine {
                 int x = rightAngleVertex.getX() + sum.getX();
                 int y = rightAngleVertex.getY() + sum.getY();
                 if (x < 0 || x >= gameBoard.getSize() || y < 0 || y >= gameBoard.getSize()) continue;
+                if (gameBoard.getBoard().containsKey(new Coordinates(x, y))) continue;
                 Coordinates missingPoint = new Coordinates(x, y);
                 log.debug("Недостающая точка: {}", missingPoint);
                 frameMissingElements.add(missingPoint);
