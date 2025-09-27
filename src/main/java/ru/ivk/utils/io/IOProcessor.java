@@ -6,6 +6,8 @@ import ru.ivk.utils.io.commands.CommandFactory;
 import ru.ivk.utils.io.commands.CommandResult;
 import ru.ivk.utils.io.commands.InputCommand;
 import ru.ivk.utils.io.commands.exceptions.CommandNotFoundException;
+import ru.ivk.utils.io.commands.exceptions.InvalidArgumentTypeException;
+import ru.ivk.utils.io.commands.exceptions.InvalidNumberOfArgumentsException;
 import ru.ivk.utils.io.commands.game.dto.DTO;
 
 import java.util.Arrays;
@@ -72,21 +74,21 @@ public class IOProcessor {
             case GAME:
                 // GAME N, U1, U2
                 // N > 2; U -> 'TYPE C'
-                if (args.length != InputCommand.GAME.getArgsAmount()) throw new Exception(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", InputCommand.GAME.getArgsAmount(), args.length));
-                if (!integerPattern.matcher(args[0]).matches()) throw new Exception("Неверный тип аргумента № 1! (Ожидается целочисленный тип)");
-                if (Integer.parseInt(args[0]) <= 2) throw new Exception("Неверный тип аргумента № 1! (Ожидается целое число, большее двух)");
-                if (!userConfigPattern.matcher(args[1]).matches()) throw new Exception("Неверный тип аргумента № 2! (Ожидается строка в формате 'TYPE COLOR')");
-                if (!userConfigPattern.matcher(args[2]).matches()) throw new Exception("Неверный тип аргумента № 3! (Ожидается строка в формате 'TYPE COLOR')");
+                if (args.length != InputCommand.GAME.getArgsAmount()) throw new InvalidNumberOfArgumentsException(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", InputCommand.GAME.getArgsAmount(), args.length));
+                if (!integerPattern.matcher(args[0]).matches()) throw new InvalidArgumentTypeException("Неверный тип аргумента № 1! (Ожидается целочисленный тип)");
+                if (Integer.parseInt(args[0]) <= 2) throw new InvalidArgumentTypeException("Неверный тип аргумента № 1! (Ожидается целое число, большее двух)");
+                if (!userConfigPattern.matcher(args[1]).matches()) throw new InvalidArgumentTypeException("Неверный тип аргумента № 2! (Ожидается строка в формате 'TYPE COLOR')");
+                if (!userConfigPattern.matcher(args[2]).matches()) throw new InvalidArgumentTypeException("Неверный тип аргумента № 3! (Ожидается строка в формате 'TYPE COLOR')");
                 return CommandFactory.getCommand(cmd, args);
             case MOVE:
                 // MOVE X, Y
-                if (args.length != InputCommand.MOVE.getArgsAmount()) throw new Exception(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", InputCommand.MOVE.getArgsAmount(), args.length));
-                if (!integerPattern.matcher(args[0]).matches()) throw new Exception("Неверный тип аргумента № 1! (Ожидается целочисленный тип)");
-                if (!integerPattern.matcher(args[1]).matches()) throw new Exception("Неверный тип аргумента № 2! (Ожидается целочисленный тип)");
+                if (args.length != InputCommand.MOVE.getArgsAmount()) throw new InvalidNumberOfArgumentsException(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", InputCommand.MOVE.getArgsAmount(), args.length));
+                if (!integerPattern.matcher(args[0]).matches()) throw new InvalidArgumentTypeException("Неверный тип аргумента № 1! (Ожидается целочисленный тип)");
+                if (!integerPattern.matcher(args[1]).matches()) throw new InvalidArgumentTypeException("Неверный тип аргумента № 2! (Ожидается целочисленный тип)");
                 return CommandFactory.getCommand(cmd, args);
             case EXIT:
             case HELP:
-                if (args.length != InputCommand.HELP.getArgsAmount()) throw new Exception(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", InputCommand.HELP.getArgsAmount(), args.length));
+                if (args.length != InputCommand.HELP.getArgsAmount()) throw new InvalidNumberOfArgumentsException(String.format("Неверное число аргументов! (Ожидается: %d; получено: %d)", InputCommand.HELP.getArgsAmount(), args.length));
                 return CommandFactory.getCommand(cmd, args);
             default:
                 throw new CommandNotFoundException("Что-то пошло не так... Введенная команда не существует!");
