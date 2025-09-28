@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.ivk.web.dto.BoardDTO;
 import ru.ivk.web.dto.SimpleMoveDTO;
+import ru.ivk.web.utils.CustomResponseEntity;
 
 import javax.validation.Valid;
 

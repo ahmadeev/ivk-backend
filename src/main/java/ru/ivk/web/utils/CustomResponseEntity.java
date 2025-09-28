@@ -1,4 +1,4 @@
-package ru.ivk.web;
+package ru.ivk.web.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
