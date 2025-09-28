@@ -22,6 +22,12 @@ public class GameBoard {
         this.emptySquaresCount = size * size;
     }
 
+    public GameBoard(int size, Map<Coordinates, String> board) {
+        this.size = size;
+        this.board = board;
+        this.emptySquaresCount = size * size - board.size();
+    }
+
     public boolean isFree(Coordinates coordinates) {
         return !board.containsKey(coordinates);
     }

@@ -57,6 +57,17 @@ public class GameEngine {
         return false;
     }
 
+    public boolean isWin(GameBoard gameBoard, UserColor color) {
+        Map<Coordinates, String> points = gameBoard.getMovesByColor(color);
+        log.debug("Отфильтрованные по цвету {} точки: {}", color.getColor(), points);
+        if (points.size() < 4) return false;
+
+        for (Coordinates key : points.keySet()) {
+            if (isWin(gameBoard, key, color)) return true;
+        }
+        return false;
+    }
+
     // todo: на больших досках не находит победу, потому что не складывается рамка из трех. идет глупый перебор
     // todo: нужно искать решения и для двух точек
     /** Возвращает список точек (с повторами), дополняющих некоторые рамки до квадрата определенного цвета */
