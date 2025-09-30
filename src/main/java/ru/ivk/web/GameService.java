@@ -57,14 +57,14 @@ public class GameService {
             throw new IllegalArgumentException("Ошибка: переданы несогласованные аргументы data и nextPlayerColor");
         }
 
+        // проверяем корректность ввода: проверка, не победил ли компьютер до своего хода
+        if (gameEngine.isWin(gameBoard, userColor)) {
+            throw new IllegalStateException(String.format("Ошибка: найдена победа игрока %s", userColor));
+        }
         // проверяем, не было ли победы после хода игрока
         UserColor otherUserColor = UserColor.getOtherColor(userColor);
         if (gameEngine.isWin(gameBoard, otherUserColor)) {
             throw new PlayerWinGameStateException(String.format("Победа игрока %s", otherUserColor)); // на самом деле не ошибка :(
-        }
-        // проверяем корректность ввода: проверка, не победил ли компьютер до своего хода
-        if (gameEngine.isWin(gameBoard, userColor)) {
-            throw new IllegalStateException(String.format("Ошибка: найдена победа игрока %s", userColor));
         }
         if (board.size() == size * size) {
             throw new DrawGameStateException("Ничья"); // на самом деле не ошибка :(
