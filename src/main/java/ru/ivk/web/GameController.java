@@ -7,12 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ivk.web.dto.BoardDTO;
-import ru.ivk.web.dto.GameStateDTO;
-import ru.ivk.web.dto.SimpleMoveDTO;
-import ru.ivk.web.exceptions.ComputerWinGameStateException;
-import ru.ivk.web.exceptions.DrawGameStateException;
-import ru.ivk.web.exceptions.PlayerWinGameStateException;
-import ru.ivk.web.utils.CustomResponseEntity;
+import ru.ivk.web.utils.GameResponseEntity;
 
 import javax.validation.Valid;
 
@@ -23,28 +18,12 @@ public class GameController {
     protected final GameService gameService;
 
     @PostMapping("/nextMove")
-    public ResponseEntity<CustomResponseEntity<?>> getMove(@Valid @RequestBody BoardDTO boardDTO) {
+    public ResponseEntity<GameResponseEntity> getMove(@Valid @RequestBody BoardDTO boardDTO) {
         try {
-            SimpleMoveDTO move = gameService.getMove(boardDTO);
-            return ResponseEntity.ok().body(
-                    new CustomResponseEntity<>("", GameState.IN_PROCESS.toString(), move)
-            );
-        } catch (PlayerWinGameStateException e) {
-            return ResponseEntity.ok().body(
-                    new CustomResponseEntity<>(e.getMessage(), GameState.END.toString(),new GameStateDTO(EndGameState.PLAYER_WIN.toString()))
-            );
-        } catch (ComputerWinGameStateException e) {
-            return ResponseEntity.ok().body(
-                    new CustomResponseEntity<>(e.getMessage(), GameState.END.toString(),new GameStateDTO(EndGameState.COMPUTER_WIN.toString()))
-            );
-        } catch (DrawGameStateException e) {
-            return ResponseEntity.ok().body(
-                    new CustomResponseEntity<>(e.getMessage(), GameState.END.toString(), new GameStateDTO(EndGameState.DRAW.toString()))
-            );
+            GameResponseEntity res = gameService.getMove(boardDTO);
+            return ResponseEntity.ok().body(res);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    new CustomResponseEntity<>(e.getMessage(), GameState.INVALID.toString(), null)
-            );
+            return ResponseEntity.badRequest().body(GameResponseEntity.error(e.getMessage()));
         }
 
     }

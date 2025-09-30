@@ -1,4 +1,4 @@
-package ru.ivk.web;
+package ru.ivk.web.utils;
 
 public enum GameState {
     INVALID,

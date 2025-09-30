@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SimpleMoveDTO implements DTO {
+public class SimpleMoveDTO {
     private int x;
     private int y;
     private String color;

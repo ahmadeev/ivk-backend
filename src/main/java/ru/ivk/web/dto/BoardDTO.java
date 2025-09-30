@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 @Getter
 @Setter
 @ToString
-public class BoardDTO implements DTO {
+public class BoardDTO {
     @Min(3)
     @Max(20)
     private int size;
