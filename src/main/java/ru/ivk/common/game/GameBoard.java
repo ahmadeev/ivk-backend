@@ -45,7 +45,7 @@ public class GameBoard {
         }
     }
 
-    private Coordinates findFirstFree() {
+    public Coordinates findFirstFree() {
         Set<Coordinates> occupied = new HashSet<>(this.board.keySet());
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
