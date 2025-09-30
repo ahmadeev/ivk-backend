@@ -1,4 +1,4 @@
-package ru.ivk.web.utils;
+package ru.ivk.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CustomResponseEntity<T> {
-    private String details;
-    private String status;
-    private T data;
+public class GameStateDTO implements DTO {
+    private String state;
 }

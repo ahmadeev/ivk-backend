@@ -9,6 +9,9 @@ import ru.ivk.common.game.model.UserColor;
 import ru.ivk.common.math.Coordinates;
 import ru.ivk.web.dto.BoardDTO;
 import ru.ivk.web.dto.SimpleMoveDTO;
+import ru.ivk.web.exceptions.ComputerWinGameStateException;
+import ru.ivk.web.exceptions.DrawGameStateException;
+import ru.ivk.web.exceptions.PlayerWinGameStateException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,19 +57,31 @@ public class GameService {
             throw new IllegalArgumentException("Ошибка: переданы несогласованные аргументы data и nextPlayerColor");
         }
 
+        // проверяем, не было ли победы после хода игрока
         UserColor otherUserColor = UserColor.getOtherColor(userColor);
         if (gameEngine.isWin(gameBoard, otherUserColor)) {
-            throw new RuntimeException(String.format("Победа игрока %s", otherUserColor)); // на самом деле не ошибка :(
+            throw new PlayerWinGameStateException(String.format("Победа игрока %s", otherUserColor)); // на самом деле не ошибка :(
         }
+        // проверяем корректность ввода: проверка, не победил ли компьютер до своего хода
         if (gameEngine.isWin(gameBoard, userColor)) {
             throw new IllegalStateException(String.format("Ошибка: найдена победа игрока %s", userColor));
         }
         if (board.size() == size * size) {
-            throw new RuntimeException("Ничья"); // на самом деле не ошибка :(
+            throw new DrawGameStateException("Ничья"); // на самом деле не ошибка :(
         }
 
         Coordinates move = gameEngine.findBestMove(gameBoard, userColor);
         log.debug("Наилучший ход: {}", move.toString());
+
+        // проверяем, не было ли победы после хода компьютера
+        gameBoard.move(move, userColor.getColor());
+        log.debug("Состояние доски после хода компьютера: {}", gameBoard.getBoard());
+        if (gameEngine.isWin(gameBoard, userColor)) {
+            throw new ComputerWinGameStateException(String.format("Победа игрока %s", userColor));
+        }
+        if (board.size() == size * size) {
+            throw new DrawGameStateException("Ничья"); // на самом деле не ошибка :(
+        }
 
         return new SimpleMoveDTO(move.getX(), move.getY(), userColor.getColor());
     }

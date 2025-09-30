@@ -139,6 +139,7 @@ public class GameEngine {
     }
     
     public Coordinates findBestMove(GameBoard gameBoard, UserColor color) {
+        // todo: проверка на возможность сделать ход
         Coordinates move = null;
         UserColor otherPlayerColor = UserColor.getOtherColor(color);
         // сначала проверяем потенциальные угрозы

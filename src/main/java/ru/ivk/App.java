@@ -6,7 +6,7 @@ import ru.ivk.web.WebEntryPoint;
 
 public class App {
     static {
-        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
+        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
         System.setProperty(SimpleLogger.SHOW_DATE_TIME_KEY, "true");
         System.setProperty(SimpleLogger.DATE_TIME_FORMAT_KEY, "HH:mm:ss.SSS");
         System.setProperty(SimpleLogger.SHOW_THREAD_NAME_KEY, "true");
