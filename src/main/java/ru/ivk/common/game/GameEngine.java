@@ -151,7 +151,7 @@ public class GameEngine {
             move = Utilities.findMostFrequent(moves);
         }
         // если выигрышных ходов нет, берем случайный ход
-        if (move == null) move = gameBoard.findFirstEmpty();
+        if (move == null) move = gameBoard.findFree();
         return move;
     }
 }

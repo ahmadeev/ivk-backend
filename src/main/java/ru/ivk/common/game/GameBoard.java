@@ -4,10 +4,7 @@ import lombok.Getter;
 import ru.ivk.common.game.model.UserColor;
 import ru.ivk.common.math.Coordinates;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -15,17 +12,20 @@ public class GameBoard {
     private final int size;
     private final Map<Coordinates, String> board;
     private int emptySquaresCount;
+    private final Random random;
 
     public GameBoard(int size) {
         this.size = size;
         this.board = new HashMap<>();
         this.emptySquaresCount = size * size;
+        this.random = new Random();
     }
 
     public GameBoard(int size, Map<Coordinates, String> board) {
         this.size = size;
         this.board = board;
         this.emptySquaresCount = size * size - board.size();
+        this.random = new Random();
     }
 
     public boolean isFree(Coordinates coordinates) {
@@ -37,7 +37,15 @@ public class GameBoard {
         this.emptySquaresCount--;
     }
 
-    public Coordinates findFirstEmpty() {
+    public Coordinates findFree() {
+        if (this.emptySquaresCount < this.size * this.size * 0.3) {
+            return findFirstFree();
+        } else {
+            return findRandomFree();
+        }
+    }
+
+    private Coordinates findFirstFree() {
         Set<Coordinates> occupied = new HashSet<>(this.board.keySet());
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
@@ -48,6 +56,17 @@ public class GameBoard {
             }
         }
         return null;
+    }
+
+    public Coordinates findRandomFree() {
+        int maxAttempts = 20;
+        for (int i = 0; i < maxAttempts; i++) {
+            int x = random.nextInt(size);
+            int y = random.nextInt(size);
+            Coordinates coordinates = new Coordinates(x, y);
+            if (isFree(coordinates)) return coordinates;
+        }
+        return findFirstFree();
     }
 
     public Map<Coordinates, String> getMovesByColor(UserColor color) {
