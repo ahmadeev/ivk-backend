@@ -1,8 +1,10 @@
 package ru.ivk.common.math;
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class Vector {
     private final Coordinates p1;
     private final Coordinates p2;

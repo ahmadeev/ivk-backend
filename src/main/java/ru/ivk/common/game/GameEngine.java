@@ -105,13 +105,16 @@ public class GameEngine {
                     continue;
                 }
 
+                // fix: раньше брали и прямоугольники
+                if (v1.getLength() != v2.getLength()) continue;
+
                 Vector sum = Vector.sum(v1, v2);
                 int x = rightAngleVertex.getX() + sum.getX();
                 int y = rightAngleVertex.getY() + sum.getY();
                 if (x < 0 || x >= gameBoard.getSize() || y < 0 || y >= gameBoard.getSize()) continue;
                 if (gameBoard.getBoard().containsKey(new Coordinates(x, y))) continue;
                 Coordinates missingPoint = new Coordinates(x, y);
-                log.debug("Недостающая точка: {}", missingPoint);
+                log.debug("Недостающая точка: {} для векторов {} и {}", missingPoint, v1, v2);
                 frameMissingElements.add(missingPoint);
             }
         }
